@@ -7,6 +7,8 @@ import logging
 from app.routes.web import web
 from app.config.database import db
 
+print("DEBUG DATABASE_URL =", os.getenv("DATABASE_URL"))
+
 
 app = Flask(__name__)
 
