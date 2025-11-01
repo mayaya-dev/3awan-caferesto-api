@@ -1,0 +1,7 @@
+flask==3.0.0
+flask-cors==4.0.0
+sqlalchemy==2.0.44
+psycopg2-binary==2.9.11
+python-dotenv==1.0.1
+gunicorn==21.2.0
+marshmallow-sqlalchemy==0.29.0
