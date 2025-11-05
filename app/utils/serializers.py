@@ -1,6 +1,5 @@
 """Helper functions for serializing models to dictionaries."""
 from datetime import datetime
-from app.models.order import OrderStatus
 
 def model_to_dict(model, exclude_fields=None):
     """Convert a model instance to a dictionary."""
@@ -11,11 +10,8 @@ def model_to_dict(model, exclude_fields=None):
     for column in model.__table__.columns:
         if column.name not in exclude_fields:
             value = getattr(model, column.name)
-            # Handle enum values
-            if isinstance(value, OrderStatus):
-                value = value.value
             # Handle datetime values
-            elif isinstance(value, datetime):
+            if isinstance(value, datetime):
                 value = value.isoformat() if value else None
             data[column.name] = value
     return data

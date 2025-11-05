@@ -1,4 +1,4 @@
-from app.models.order import Order, OrderStatus
+from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.menu import Menu
 from app.config.database import SessionLocal
@@ -56,10 +56,9 @@ def create_order(data):
     except ValueError as e:
         return {"error": str(e)}, 400
     order_items_data = validated.pop("order_items", [])
-    status_enum = validated.get("status", OrderStatus.PENDING)
     db = SessionLocal()
     try:
-        order = Order(order_date=datetime.datetime.utcnow(), status=status_enum)
+        order = Order(order_date=datetime.datetime.utcnow())
         db.add(order)
         db.commit()
         db.refresh(order)

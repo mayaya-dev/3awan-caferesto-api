@@ -1,5 +1,4 @@
 """Validation functions for request data."""
-from app.models.order import OrderStatus
 
 def validate_required(data, field, field_type=None):
     """Validate that a required field exists and optionally check its type."""
@@ -127,9 +126,6 @@ def validate_order_input(data, partial=False):
     """Validate order creation/update input."""
     validated = {}
     required = not partial
-    
-    if 'status' in data or required:
-        validated['status'] = validate_enum(data, 'status', OrderStatus, required=required)
     
     if 'order_items' in data:
         items = data.get('order_items', [])
