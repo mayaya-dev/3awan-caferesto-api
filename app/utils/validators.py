@@ -122,10 +122,29 @@ def validate_order_item_input(data, partial=False):
     
     return validated
 
+def validate_order_item_for_create(data):
+    """Validate an order item in the context of creating a new order.
+    Requires menu_id and quantity; does NOT require order_id because it is set after the order is created.
+    """
+    from app.models.menu import Menu
+    validated = {}
+    # menu_id and quantity are required for creating order items via /orders
+    validated['menu_id'] = validate_foreign_key(data, 'menu_id', Menu, required=True)
+    validated['quantity'] = validate_number(data, 'quantity', required=True, min_value=1, field_type=int)
+    # price optional; if omitted, controller will default from menu
+    if 'price' in data:
+        validated['price'] = validate_number(data, 'price', required=False, min_value=0)
+    return validated
+
 def validate_order_input(data, partial=False):
     """Validate order creation/update input."""
     validated = {}
     required = not partial
+    
+    # Optional customer_name on order
+    customer_name = validate_string(data, 'customer_name', required=False, max_length=100)
+    if customer_name is not None:
+        validated['customer_name'] = customer_name
     
     if 'order_items' in data:
         items = data.get('order_items', [])
@@ -136,7 +155,9 @@ def validate_order_input(data, partial=False):
         for item in items:
             if not isinstance(item, dict):
                 raise ValueError("Each order item must be an object")
-            validated_items.append(validate_order_item_input(item, partial=partial))
+            # In the context of creating/updating an order, order_id is set by the controller.
+            # Require menu_id and quantity for each item.
+            validated_items.append(validate_order_item_for_create(item))
         validated['order_items'] = validated_items
     elif required:
         raise ValueError("order_items is required")

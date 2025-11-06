@@ -56,9 +56,10 @@ def create_order(data):
     except ValueError as e:
         return {"error": str(e)}, 400
     order_items_data = validated.pop("order_items", [])
+    customer_name = validated.get("customer_name")
     db = SessionLocal()
     try:
-        order = Order(order_date=datetime.datetime.utcnow())
+        order = Order(order_date=datetime.datetime.utcnow(), customer_name=customer_name)
         db.add(order)
         db.commit()
         db.refresh(order)
