@@ -9,6 +9,7 @@ class Order(db.Model):
     
     order_id = db.Column(db.Integer, primary_key=True)
     order_date = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
+    customer_name = db.Column(db.String(100))
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now())
     deleted_at = db.Column(db.DateTime)
