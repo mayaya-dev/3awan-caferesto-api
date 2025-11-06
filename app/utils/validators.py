@@ -141,8 +141,8 @@ def validate_order_input(data, partial=False):
     validated = {}
     required = not partial
     
-    # Optional customer_name on order
-    customer_name = validate_string(data, 'customer_name', required=False, max_length=100)
+    # customer_name required when creating an order (partial=False), optional on updates
+    customer_name = validate_string(data, 'customer_name', required=required, max_length=100)
     if customer_name is not None:
         validated['customer_name'] = customer_name
     
