@@ -2,7 +2,7 @@ from app.models.order_item import OrderItem
 from app.models.menu import Menu
 from app.config.database import SessionLocal
 from app.utils.serializers import serialize_order_item, serialize_order_items
-from flask import jsonify
+from flask import jsonify, request
 from app.utils.validators import validate_order_item_input
 import datetime
 import logging
@@ -14,7 +14,9 @@ def get_all_order_items():
     db = SessionLocal()
     try:
         items = db.query(OrderItem).filter(OrderItem.deleted_at.is_(None)).all()
-        return jsonify(serialize_order_items(items))
+        tz = request.args.get('tz')
+        tz_style = request.args.get('tz_style', 'offset')
+        return jsonify(serialize_order_items(items, tz_name=tz, tz_style=tz_style))
     except Exception as e:
         logger.exception("Failed to fetch order items")
         return {"error": str(e)}, 500
@@ -25,7 +27,9 @@ def get_all_order_item_list():
     db = SessionLocal()
     try:
         items = db.query(OrderItem).all()
-        return jsonify(serialize_order_items(items))
+        tz = request.args.get('tz')
+        tz_style = request.args.get('tz_style', 'offset')
+        return jsonify(serialize_order_items(items, tz_name=tz, tz_style=tz_style))
     except Exception as e:
         logger.exception("Failed to fetch order items")
         return {"error": str(e)}, 500
@@ -41,7 +45,9 @@ def get_order_item_by_id(item_id: int):
         ).first()
         if not item:
             return {"error": "OrderItem not found"}, 404
-        return serialize_order_item(item)
+        tz = request.args.get('tz')
+        tz_style = request.args.get('tz_style', 'offset')
+        return serialize_order_item(item, tz_name=tz, tz_style=tz_style)
     except Exception as e:
         logger.exception("Failed to fetch order item by id")
         return {"error": str(e)}, 500
@@ -68,7 +74,9 @@ def create_order_item(data):
         db.commit()
         db.refresh(item)
         logger.info("Created order_item", extra={"order_item_id": item.order_item_id})
-        return serialize_order_item(item), 201
+        tz = request.args.get('tz')
+        tz_style = request.args.get('tz_style', 'offset')
+        return serialize_order_item(item, tz_name=tz, tz_style=tz_style), 201
     except Exception as e:
         db.rollback()
         logger.exception("Failed to create order_item")
@@ -98,7 +106,9 @@ def update_order_item(item_id: int, data):
         db.commit()
         db.refresh(item)
         logger.info("Updated order_item", extra={"order_item_id": item.order_item_id})
-        return serialize_order_item(item)
+        tz = request.args.get('tz')
+        tz_style = request.args.get('tz_style', 'offset')
+        return serialize_order_item(item, tz_name=tz, tz_style=tz_style)
     except Exception as e:
         db.rollback()
         logger.exception("Failed to update order_item")
